@@ -41,7 +41,7 @@ exports.loginUser = async (req, res) => {
 
 exports.getHasPlayedToday = async (req, res) => {
   try {
-      const userId = req.params.userId; // Assuming you're passing the user ID as a URL parameter
+      const userId = req.params.userId; 
 
       if (!userId) {
           return res.status(400).send({ message: "User ID is required" });

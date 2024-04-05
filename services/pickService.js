@@ -57,7 +57,7 @@ exports.getPicksFromLatestRound = async (user_id) => {
     });
 
     // Separate the user's pick from others
-    const userPick = picksInRound.find(pick => pick.user_id == user_id);
+    const userPick = allPicks.find(pick => pick.user_id == user_id);
 
     return {
         userPick, // The latest pick from the user in the latest round they participated
