@@ -25,4 +25,22 @@ exports.getUserPicks = async (req, res) => {
     }
 };
 
+exports.getPicksFromLatestRoundForUser = async (req, res) => {
+    try {
+        const userId = req.params.userId || req.body.userId;
+
+        if (!userId) {
+            return res.status(400).send({ message: "User ID is required" });
+        }
+
+        const result = await pickService.getPicksFromLatestRound(userId);
+        if (result) {
+            res.status(200).send(result);
+        } else {
+            res.status(404).send({ message: "No picks found for the latest round of the specified user." });
+        }
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};
 // Additional controller methods for managing picks can be added here
