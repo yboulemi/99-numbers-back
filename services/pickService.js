@@ -50,7 +50,7 @@ exports.getPicksFromLatestRound = async (user_id) => {
 
     if (!latestPick) return null; 
 
-    const picksInRound = await Pick.findAll({
+    const allPicks = await Pick.findAll({
         where: { round_id: latestPick.round_id },
         attributes: ['pick_id', 'round_id', 'user_id', 'number_picked', 'is_unique'],
         order: [['number_picked', 'ASC']], 
@@ -58,10 +58,9 @@ exports.getPicksFromLatestRound = async (user_id) => {
 
     // Separate the user's pick from others
     const userPick = picksInRound.find(pick => pick.user_id == user_id);
-    const otherPicks = picksInRound.filter(pick => pick.user_id != user_id);
 
     return {
         userPick, // The latest pick from the user in the latest round they participated
-        otherPicks, // All other picks from the same round
+        allPicks, // All picks from the same round
     };
 };
