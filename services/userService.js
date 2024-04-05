@@ -52,7 +52,7 @@ exports.authenticateUser = async ({ email, password }) => {
     throw new Error('User not found');
   }
 
-  const match = await bcrypt.compare(password, user.password_hash); // Ensure field name matches your model
+  const match = await bcrypt.compare(password, user.password_hash); 
 
   if (!match) {
     throw new Error('Password is incorrect');
@@ -70,4 +70,33 @@ exports.authenticateUser = async ({ email, password }) => {
       userId: user.user_id,
       login: user.login
   };
+};
+
+exports.getHasPlayedTodayStatus = async (user_id) => {
+  try {
+      const user = await User.findOne({
+          where: { user_id },
+          attributes: ['has_played_today'], // Only fetch the 'has_played_today' attribute
+      });
+
+      if (!user) {
+          throw new Error('User not found');
+      }
+
+      // Return the 'has_played_today' status directly as a boolean
+      // Assuming 'has_played_today' is stored as an integer (0 or 1) and using the getter method defined in your model
+      return user.has_played_today;
+  } catch (error) {
+      console.error('Error fetching has_played_today status:', error);
+      throw error; // Rethrow the error or handle it as needed
+  }
+};
+
+exports.resetHasPlayedToday = async () => {
+  try {
+      await User.update({ has_played_today: 0 }, { where: {} }); // Resets for all users
+      console.log('Successfully reset `has_played_today` for all users.');
+  } catch (error) {
+      console.error('Error resetting `has_played_today`:', error);
+  }
 };

@@ -1,4 +1,5 @@
 const Pick = require('../db/models/Pick');
+const User = require('../db/models/User');
 const roundService = require('./roundService');
 const { Op } = require('sequelize');
 
@@ -14,6 +15,10 @@ exports.createPick = async ({ user_id, number_picked }) => {
 
     // Trigger a round check after creating a pick
     await roundService.checkAndCloseRound(openRound.round_id);
+
+    // Set has_played_today to 1 for the user
+    await User.update({ has_played_today: 1 }, { where: { user_id: user_id } });
+
     return { pick_id: pick.pick_id, round_id: pick.round_id, user_id: pick.user_id, number_picked: pick.number_picked };
 };
 

@@ -22,8 +22,6 @@ exports.registerUser = async (req, res) => {
 
 exports.modifyPassword = async (req, res) => {
   try {
-    // Assuming the userId is in the request body or extracted from authentication token
-    // and newPassword is also provided in the request body
     const { userId, newPassword } = req.body;
     await userService.modifyPassword(userId, newPassword);
     res.status(200).send({ message: 'Password updated successfully' });
@@ -38,5 +36,22 @@ exports.loginUser = async (req, res) => {
     res.status(200).send({ data });
   } catch (error) {
     res.status(401).send(error.message);
+  }
+};
+
+exports.getHasPlayedToday = async (req, res) => {
+  try {
+      const userId = req.params.userId; // Assuming you're passing the user ID as a URL parameter
+
+      if (!userId) {
+          return res.status(400).send({ message: "User ID is required" });
+      }
+
+      const hasPlayedToday = await userService.getHasPlayedTodayStatus(userId);
+
+      res.status(200).send({ userId, hasPlayedToday });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: error.message });
   }
 };

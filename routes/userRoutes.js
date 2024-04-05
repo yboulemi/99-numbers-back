@@ -14,4 +14,7 @@ router.patch('/modify-password', userController.modifyPassword);
 // Route for user login
 router.post('/login', userController.loginUser);
 
+// Route for checking if a user has played today
+router.get('/:userId/has-played-today', userController.getHasPlayedToday);
+
 module.exports = router;

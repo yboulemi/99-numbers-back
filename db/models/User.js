@@ -26,6 +26,19 @@ User.init({
     password_hash: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    has_played_today: {
+        type: DataTypes.TINYINT,
+        allowNull: false,
+        defaultValue: 0, 
+        get() {
+            // Use a getter method to return a proper boolean value when accessed
+            return this.getDataValue('has_played_today') === 1;
+        },
+        set(value) {
+            // Use a setter to convert a boolean to the appropriate tinyint value
+            this.setDataValue('has_played_today', value ? 1 : 0);
+        }
     }
 }, {
     sequelize,
