@@ -48,7 +48,7 @@ exports.getPicksFromLatestRound = async (user_id) => {
         attributes: ['pick_id', 'round_id', 'user_id', 'number_picked', 'is_unique'],
     });
 
-    if (!latestPick) return null; 
+    if (!latestPick) return { userPick: null, allPicks: []}; 
 
     const allPicks = await Pick.findAll({
         where: { round_id: latestPick.round_id },
