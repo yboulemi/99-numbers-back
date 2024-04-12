@@ -29,6 +29,8 @@ const corsOptions = {
   allowedHeaders: 'Content-Type,Authorization'
 };
 
+app.use(cors(corsOptions));
+
 app.use('/api', routes);
 
 // Setup scheduled tasks
