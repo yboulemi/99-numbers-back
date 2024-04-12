@@ -13,7 +13,15 @@ exports.createUser = async ({ email, login, password }) => {
     login,
     password_hash 
   });
-  return { id: user.user_id, email: user.email, login: user.login };
+
+  // Generate a token
+  const token = jwt.sign(
+    { userId: user.user_id, email: user.email }, // Payload
+    secretKey, // Secret key
+    { expiresIn: '24h' } // Token expiration
+  );
+  
+  return { token: token, userId: user.user_id, login: user.login };
 };
 
 // exports.deleteUser = async (userId) => {
