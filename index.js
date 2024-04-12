@@ -21,10 +21,13 @@ const port = process.env.PORT || 3252;
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// CORS configuration for development
-app.use(cors({
-  origin: 'http://localhost:3000'
-}));
+
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' ? 'https://99-numbers.com' : 'http://localhost:3000',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true, // enabling cookies and auth headers
+  allowedHeaders: 'Content-Type,Authorization'
+};
 
 app.use('/api', routes);
 
