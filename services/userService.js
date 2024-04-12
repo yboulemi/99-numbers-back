@@ -6,22 +6,40 @@ const saltRounds = 10;
 const secretKey = process.env.JWT_SECRET;
 
 exports.createUser = async ({ email, login, password }) => {
-  const password_hash = await bcrypt.hash(password, saltRounds);
-  // Using Sequelize model to create a user
-  const user = await User.create({
-    email,
-    login,
-    password_hash 
-  });
+  try {
+    const password_hash = await bcrypt.hash(password, saltRounds);
+    const user = await User.create({
+      email,
+      login,
+      password_hash
+    });
 
-  // Generate a token
-  const token = jwt.sign(
-    { userId: user.user_id, email: user.email }, // Payload
-    secretKey, // Secret key
-    { expiresIn: '24h' } // Token expiration
-  );
-  
-  return { token: token, userId: user.user_id, login: user.login };
+    const token = jwt.sign(
+      { userId: user.user_id, email: user.email, role: user.role },
+      secretKey,
+      { expiresIn: '24h' }
+    );
+
+    return { token: token, userId: user.user_id, login: user.login, role: user.role };
+  } catch (error) {
+    // Check for unique constraint errors
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      // Map to identify which field had the unique constraint error
+      const errorFields = error.errors.map(err => err.path);
+      const errorMessages = {
+        email: 'Email already in use',
+        login: 'Login already taken'
+      };
+
+      // Generate a meaningful error message based on the fields that had the error
+      const errorMessage = errorFields.map(field => errorMessages[field]).join(', ');
+
+      throw new Error(errorMessage); // Throw with custom error message
+    }
+    
+    // Rethrow if it's not a unique constraint error
+    throw error;
+  }
 };
 
 // exports.deleteUser = async (userId) => {
@@ -68,7 +86,7 @@ exports.authenticateUser = async ({ email, password }) => {
 
   // Generate a token
   const token = jwt.sign(
-    { userId: user.user_id, email: user.email }, // Payload
+    { userId: user.user_id, email: user.email, role: user.role }, // Payload
     secretKey, // Secret key
     { expiresIn: '24h' } // Token expiration
   );
@@ -76,7 +94,8 @@ exports.authenticateUser = async ({ email, password }) => {
   return { 
       token: token, 
       userId: user.user_id,
-      login: user.login
+      login: user.login,
+      role: user.role
   };
 };
 
@@ -106,5 +125,32 @@ exports.resetHasPlayedToday = async () => {
       console.log('Successfully reset `has_played_today` for all users.');
   } catch (error) {
       console.error('Error resetting `has_played_today`:', error);
+  }
+};
+
+exports.getAllUsers = async () => {
+  try {
+    const users = await User.findAll({
+      attributes: ['user_id', 'email', 'login', 'role']  // Specify attributes to avoid sending sensitive data like passwords
+    });
+    return users;
+  } catch (error) {
+    console.error('Failed to retrieve users:', error);
+    throw error; // Rethrow the error or handle it as needed
+  }
+};
+
+exports.updateUserRole = async (userId, newRole) => {
+  try {
+    const [updated] = await User.update({ role: newRole }, {
+      where: { user_id: userId }
+    });
+
+    if (!updated) throw new Error('No user found with the given ID or no change needed.');
+
+    return { message: 'User role updated successfully.' };
+  } catch (error) {
+    console.error('Failed to update user role:', error);
+    throw error;  // Rethrow to handle in the controller
   }
 };

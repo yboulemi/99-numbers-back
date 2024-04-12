@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const { authenticateToken } = require('../middleware/authMiddleware');
 const pickController = require('../controllers/pickController');
 
-router.post('/', pickController.createPick);
+router.post('/', authenticateToken, pickController.createPick);
 
-router.get('/user/:userId', pickController.getUserPicks);
+router.get('/user/:userId', authenticateToken, pickController.getUserPicks);
 
-router.get('/user/:userId/latest-round', pickController.getPicksFromLatestRoundForUser);
+router.get('/user/:userId/latest-round', authenticateToken, pickController.getPicksFromLatestRoundForUser);
 
 // Additional routes for managing picks can be added here
 

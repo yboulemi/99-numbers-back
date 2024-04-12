@@ -39,6 +39,12 @@ User.init({
             // Use a setter to convert a boolean to the appropriate tinyint value
             this.setDataValue('has_played_today', value ? 1 : 0);
         }
+    },
+    role: {
+        type: DataTypes.ENUM,
+        values: ['admin', 'mod', 'player'],
+        defaultValue: 'player',
+        allowNull: false
     }
 }, {
     sequelize,
