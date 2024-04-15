@@ -4,6 +4,20 @@ const roundService = require('./roundService');
 const { Op } = require('sequelize');
 
 exports.createPick = async ({ user_id, number_picked }) => {
+    // First, check if the user has already played today
+    const user = await User.findOne({
+        where: { user_id }
+    });
+
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    if (user.has_played_today) {
+        // If the user has already played today, throw an error or handle as needed
+        throw new Error('User has already played today');
+    }
+
     // Ensure there is an open round and get its ID
     const openRound = await roundService.ensureOpenRound();
 
@@ -21,6 +35,7 @@ exports.createPick = async ({ user_id, number_picked }) => {
 
     return { pick_id: pick.pick_id, round_id: pick.round_id, user_id: pick.user_id, number_picked: pick.number_picked };
 };
+
 
 exports.getUserPicksWithOutcome = async (user_id) => {
     // Fetch all finished picks made by the user (excluding where is_unique is null)
