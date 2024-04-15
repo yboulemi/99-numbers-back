@@ -5,8 +5,8 @@ class User extends Model {}
 
 User.init({
     user_id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,  // Automatically generate UUIDs
         primaryKey: true,
         allowNull: false
     },
@@ -30,13 +30,13 @@ User.init({
     has_played_today: {
         type: DataTypes.TINYINT,
         allowNull: false,
-        defaultValue: 0, 
+        defaultValue: 0,
         get() {
-            // Use a getter method to return a proper boolean value when accessed
+            // Convert the tinyint to boolean when accessed
             return this.getDataValue('has_played_today') === 1;
         },
         set(value) {
-            // Use a setter to convert a boolean to the appropriate tinyint value
+            // Convert boolean to tinyint for storage
             this.setDataValue('has_played_today', value ? 1 : 0);
         }
     },
